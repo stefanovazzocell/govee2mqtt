@@ -1,5 +1,8 @@
 # Govee to MQTT bridge for Home Assistant
 
+Based on: https://github.com/wez/govee2mqtt
+With fixes from: https://github.com/AlekseyBlokhin:govee2mqtt-f
+
 This repo provides a `govee` executable whose primary purpose is to act
 as a bridge between [Govee](https://govee.com) devices and Home Assistant,
 via the [Home Assistant MQTT Integration](https://www.home-assistant.io/integrations/mqtt/).
@@ -60,4 +63,3 @@ Control](https://github.com/wez/govee-lan-hass/).
 
 The AWS IoT support was made possible by the work of @bwp91 in
 [homebridge-govee](https://github.com/bwp91/homebridge-govee/).
-

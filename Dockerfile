@@ -1,9 +1,12 @@
 ####################################################################################################
 ## Builder
 ####################################################################################################
-FROM --platform=$BUILDPLATFORM alpine:latest AS builder
-ARG TARGETPLATFORM
+FROM --platform=$BUILDPLATFORM rust:1.74-alpine AS builder
 
+# Enable cross-compilation support
+RUN apk add --no-cache musl-dev openssl-dev pkgconfig build-base git
+
+# Create user (same as original)
 RUN adduser \
     --disabled-password \
     --gecos "" \
@@ -13,10 +16,15 @@ RUN adduser \
     --uid "1000" \
     "govee"
 
-WORKDIR /work
-COPY docker-target/$TARGETPLATFORM/govee /work
+# Set working directory
+WORKDIR /build
 
-# Creates an empty /data dir that we can use to copy and chown in the next stage
+# Copy all source code
+COPY . .
+
+# Build for release
+RUN cargo build --release
+
 WORKDIR /data
 
 ####################################################################################################
@@ -31,7 +39,7 @@ COPY --from=builder /etc/group /etc/group
 
 WORKDIR /app
 
-COPY --from=builder /work/govee /app/govee
+COPY --from=builder /build/target/release/govee /app/govee
 COPY AmazonRootCA1.pem /app
 COPY --from=builder --chown=govee:govee /data /data
 COPY assets /app/assets
@@ -50,5 +58,3 @@ CMD ["/app/govee", \
   "--govee-iot-key=/data/iot.key", \
   "--govee-iot-cert=/data/iot.cert", \
   "--amazon-root-ca=/app/AmazonRootCA1.pem"]
-
-
